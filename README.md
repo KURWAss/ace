@@ -1,5 +1,10 @@
 # ace
 
+![License](https://img.shields.io/badge/license-GPLv3-blue.svg)
+![C++](https://img.shields.io/badge/C%2B%2B-17-00599C.svg)
+![Platform](https://img.shields.io/badge/platform-X11-lightgrey.svg)
+![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)
+
 A minimal floating window manager for X11, written in C++.
 
 ## Features

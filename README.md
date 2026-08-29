@@ -97,6 +97,11 @@ exec /path/to/ace
 
 and start your session with `startx`.
 
+## Screenshots
+
+[Screen1](assets/screenshot1.png)
+[Screen2](assets/screenshot2.png)
+
 ## License
 
 This project is licensed under the GNU General Public License v3.0 (GPLv3).

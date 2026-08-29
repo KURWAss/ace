@@ -1,0 +1,12 @@
+# Normalize line endings for all text files
+* text=auto eol=lf
+
+*.cpp text diff=cpp
+*.h   text diff=cpp
+
+Makefile text
+*.mk     text
+
+*.md text
+
+*.out binary

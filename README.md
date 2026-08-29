@@ -73,6 +73,15 @@ Xephyr :1 -screen 1280x800 &
 DISPLAY=:1 ./ace
 ```
 
+Alternatively, the included `run.sh` script does this for you: it
+checks that Xephyr is installed and that `ace` has been built, then starts
+Xephyr and launches `ace` on `DISPLAY=:1`.
+ 
+```
+chmod +x run.sh
+./run.sh
+```
+
 Then, in that same `DISPLAY=:1`, you can launch any X11 application, e.g.:
 
 ```

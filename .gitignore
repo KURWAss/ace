@@ -1,2 +1,5 @@
 ace
 *.o
+pkg/
+*.pkg.tar.*
+*.log

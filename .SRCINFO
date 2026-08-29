@@ -1,0 +1,17 @@
+pkgbase = ace-git
+	pkgdesc = A minimal floating window manager for X11, written in C++ (git version)
+	pkgver = r1.0000000
+	pkgrel = 1
+	url = https://github.com/KURWAss/ace
+	arch = x86_64
+	license = GPL3
+	makedepends = git
+	makedepends = gcc
+	makedepends = make
+	depends = libx11
+	provides = ace
+	conflicts = ace
+	source = ace-git::git+https://github.com/OWNER/ace.git
+	sha256sums = SKIP
+
+pkgname = ace-git

@@ -4,6 +4,7 @@
 ![C++](https://img.shields.io/badge/C%2B%2B-17-00599C.svg)
 ![Platform](https://img.shields.io/badge/platform-X11-lightgrey.svg)
 ![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)
+![build](https://github.com/KURWAss/ace/actions/workflows/build.yml/badge.svg)
 
 ![Logo](assets/logo-small.png)
 

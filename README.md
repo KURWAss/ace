@@ -1,4 +1,4 @@
-![Logo](assets/logo.png)
+![Logo](assets/logo-small.png)
 # ace
 
 ![License](https://img.shields.io/badge/license-GPLv3-blue.svg)

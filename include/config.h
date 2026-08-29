@@ -5,5 +5,6 @@
 
 std::string GetConfigPath();
 void EnsureConfigExists();
+std::string GetTerminalCommand();
 
 #endif  // ACE_CONFIG_H_

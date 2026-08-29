@@ -52,3 +52,47 @@ void EnsureConfigExists() {
 
     out << "terminal = alacritty\n";
 }
+
+std::string GetTerminalCommand() {
+    const std::string default_terminal = "alacritty";
+
+    std::string config_path = GetConfigPath();
+    if (config_path.empty()) {
+        return default_terminal;
+    }
+
+    std::ifstream in(config_path);
+    if (!in.is_open()) {
+        return default_terminal;
+    }
+
+    std::string line;
+    while (std::getline(in, line)) {
+        size_t separator = line.find('=');
+        if (separator == std::string::npos) {
+            continue;
+        }
+
+        std::string key = line.substr(0, separator);
+        std::string value = line.substr(separator + 1);
+
+        auto trim = [](std::string& s) {
+            size_t start = s.find_first_not_of(" \t\r\n");
+            size_t end = s.find_last_not_of(" \t\r\n");
+            if (start == std::string::npos) {
+                s.clear();
+                return;
+            }
+            s = s.substr(start, end - start + 1);
+        };
+
+        trim(key);
+        trim(value);
+
+        if (key == "terminal" && !value.empty()) {
+            return value;
+        }
+    }
+
+    return default_terminal;
+}

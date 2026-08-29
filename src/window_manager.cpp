@@ -4,6 +4,10 @@
 #include <X11/Xutil.h>
 #include <X11/keysym.h>
 #include <cstdlib>
+#include <sys/wait.h>
+#include <unistd.h>
+
+#include "config.h"
 
 int WindowManager::OnXError(Display* display, XErrorEvent* e) {
     char buffer[1024];
@@ -20,7 +24,9 @@ WindowManager* WindowManager::Create() {
 }
 
 WindowManager::WindowManager(Display* display)
-    : display_(display), root_(DefaultRootWindow(display)) {}
+    : display_(display),
+      root_(DefaultRootWindow(display)),
+      terminal_command_(GetTerminalCommand()) {}
 
 WindowManager::~WindowManager() {
     XCloseDisplay(display_);
@@ -63,6 +69,15 @@ void WindowManager::Run() {
         display_,
         XKeysymToKeycode(display_, XK_Q),
         Mod1Mask | ShiftMask,
+        root_,
+        False,
+        GrabModeAsync,
+        GrabModeAsync);
+
+    XGrabKey(
+        display_,
+        XKeysymToKeycode(display_, XK_space),
+        Mod4Mask,
         root_,
         False,
         GrabModeAsync,
@@ -167,8 +182,27 @@ void WindowManager::OnMotionNotify(const XMotionEvent& e) {
 
 void WindowManager::OnKeyPress(const XKeyEvent& e) {
     KeySym keysym = XkbKeycodeToKeysym(display_, e.keycode, 0, 0);
+
     if (keysym == XK_Q && (e.state & Mod1Mask) && (e.state & ShiftMask)) {
         exit(0);
+    }
+
+    if (keysym == XK_space && (e.state & Mod4Mask)) {
+        LaunchTerminal();
+    }
+}
+
+void WindowManager::LaunchTerminal() {
+    pid_t pid = fork();
+
+    if (pid < 0) {
+        return;
+    }
+
+    if (pid == 0) {
+        setsid();
+        execlp(terminal_command_.c_str(), terminal_command_.c_str(), nullptr);
+        _exit(1);
     }
 }
 

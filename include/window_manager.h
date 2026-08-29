@@ -2,6 +2,7 @@
 #define ACE_WINDOW_MANAGER_H_
 
 #include <X11/Xlib.h>
+#include <string>
 #include <unordered_map>
 
 class WindowManager {
@@ -28,6 +29,8 @@ private:
 
     static int OnXError(Display* display, XErrorEvent* e);
 
+    void LaunchTerminal();
+
     Display* display_;
     Window root_;
 
@@ -36,6 +39,7 @@ private:
     XWindowAttributes drag_start_attributes_;
 
     std::unordered_map<Window, bool> managed_windows_;
+    std::string terminal_command_;
 };
 
 #endif  // ACE_WINDOW_MANAGER_H_

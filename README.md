@@ -66,12 +66,6 @@ exec /path/to/ace
 
 and start your session with `startx`.
 
-## Project status
-
-Early stage. No tiling, no status bar, no configuration file yet — just a
-basic floating mode. Development plans are tracked in the repository's
-issues.
-
 ## License
 
 This project is licensed under the GNU General Public License v3.0 (GPLv3).

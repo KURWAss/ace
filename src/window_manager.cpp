@@ -83,6 +83,10 @@ void WindowManager::Run() {
         GrabModeAsync,
         GrabModeAsync);
 
+    for (const std::string& command : GetAutostartCommands()) {
+        LaunchCommand(command);
+    }
+
     for (;;) {
         XEvent e;
         XNextEvent(display_, &e);
@@ -188,11 +192,11 @@ void WindowManager::OnKeyPress(const XKeyEvent& e) {
     }
 
     if (keysym == XK_space && (e.state & Mod4Mask)) {
-        LaunchTerminal();
+        LaunchCommand(terminal_command_);
     }
 }
 
-void WindowManager::LaunchTerminal() {
+void WindowManager::LaunchCommand(const std::string& command) {
     pid_t pid = fork();
 
     if (pid < 0) {
@@ -201,7 +205,7 @@ void WindowManager::LaunchTerminal() {
 
     if (pid == 0) {
         setsid();
-        execlp(terminal_command_.c_str(), terminal_command_.c_str(), nullptr);
+        execlp(command.c_str(), command.c_str(), nullptr);
         _exit(1);
     }
 }

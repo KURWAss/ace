@@ -29,7 +29,7 @@ private:
 
     static int OnXError(Display* display, XErrorEvent* e);
 
-    void LaunchTerminal();
+    void LaunchCommand(const std::string& command);
 
     Display* display_;
     Window root_;

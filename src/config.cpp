@@ -22,6 +22,31 @@ std::string GetHomeDirectory() {
     return std::string();
 }
 
+void Trim(std::string& s) {
+    size_t start = s.find_first_not_of(" \t\r\n");
+    size_t end = s.find_last_not_of(" \t\r\n");
+    if (start == std::string::npos) {
+        s.clear();
+        return;
+    }
+    s = s.substr(start, end - start + 1);
+}
+
+bool ParseConfigLine(const std::string& line, std::string& key, std::string& value) {
+    size_t separator = line.find('=');
+    if (separator == std::string::npos) {
+        return false;
+    }
+
+    key = line.substr(0, separator);
+    value = line.substr(separator + 1);
+
+    Trim(key);
+    Trim(value);
+
+    return !key.empty() && !value.empty();
+}
+
 }  // namespace
 
 std::string GetConfigPath() {
@@ -50,7 +75,7 @@ void EnsureConfigExists() {
         return;
     }
 
-    out << "terminal = alacritty\n";
+    out << "terminal = alacritty\nexecute = alacritty\n";
 }
 
 std::string GetTerminalCommand() {
@@ -67,32 +92,46 @@ std::string GetTerminalCommand() {
     }
 
     std::string line;
+    std::string key;
+    std::string value;
     while (std::getline(in, line)) {
-        size_t separator = line.find('=');
-        if (separator == std::string::npos) {
+        if (!ParseConfigLine(line, key, value)) {
             continue;
         }
 
-        std::string key = line.substr(0, separator);
-        std::string value = line.substr(separator + 1);
-
-        auto trim = [](std::string& s) {
-            size_t start = s.find_first_not_of(" \t\r\n");
-            size_t end = s.find_last_not_of(" \t\r\n");
-            if (start == std::string::npos) {
-                s.clear();
-                return;
-            }
-            s = s.substr(start, end - start + 1);
-        };
-
-        trim(key);
-        trim(value);
-
-        if (key == "terminal" && !value.empty()) {
+        if (key == "terminal") {
             return value;
         }
     }
 
     return default_terminal;
+}
+
+std::vector<std::string> GetAutostartCommands() {
+    std::vector<std::string> commands;
+
+    std::string config_path = GetConfigPath();
+    if (config_path.empty()) {
+        return commands;
+    }
+
+    std::ifstream in(config_path);
+    if (!in.is_open()) {
+        return commands;
+    }
+
+    std::string line;
+    std::string key;
+    std::string value;
+    while (std::getline(in, line)) {
+        if (!ParseConfigLine(line, key, value)) {
+            continue;
+        }
+
+        if (key == "execute") {
+            commands.push_back(value);
+        }
+    }
+
+    return commands;
 }

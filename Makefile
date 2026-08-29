@@ -3,7 +3,7 @@ CXXFLAGS := -std=c++17 -Wall -Wextra -O2 -Iinclude
 LDLIBS := -lX11
 
 SRC_DIR := src
-SOURCES := $(SRC_DIR)/main.cpp $(SRC_DIR)/window_manager.cpp
+SOURCES := $(SRC_DIR)/main.cpp $(SRC_DIR)/window_manager.cpp $(SRC_DIR)/config.cpp
 OBJECTS := $(SOURCES:.cpp=.o)
 
 TARGET := ace

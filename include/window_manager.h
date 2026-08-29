@@ -24,6 +24,7 @@ private:
     void OnMotionNotify(const XMotionEvent& e);
     void OnKeyPress(const XKeyEvent& e);
     void OnDestroyNotify(const XDestroyWindowEvent& e);
+    void OnEnterNotify(const XCrossingEvent& e);
 
     static int OnXError(Display* display, XErrorEvent* e);
 

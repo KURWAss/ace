@@ -95,6 +95,9 @@ void WindowManager::Run() {
             case DestroyNotify:
                 OnDestroyNotify(e.xdestroywindow);
                 break;
+            case EnterNotify:
+                OnEnterNotify(e.xcrossing);
+                break;
             default:
                 break;
         }
@@ -102,6 +105,7 @@ void WindowManager::Run() {
 }
 
 void WindowManager::OnMapRequest(const XMapRequestEvent& e) {
+    XSelectInput(display_, e.window, EnterWindowMask);
     XMapWindow(display_, e.window);
     managed_windows_[e.window] = true;
 
@@ -166,6 +170,10 @@ void WindowManager::OnKeyPress(const XKeyEvent& e) {
     if (keysym == XK_Q && (e.state & Mod1Mask) && (e.state & ShiftMask)) {
         exit(0);
     }
+}
+
+void WindowManager::OnEnterNotify(const XCrossingEvent& e) {
+    XSetInputFocus(display_, e.window, RevertToPointerRoot, CurrentTime);
 }
 
 void WindowManager::OnDestroyNotify(const XDestroyWindowEvent& e) {

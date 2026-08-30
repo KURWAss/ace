@@ -5,8 +5,10 @@
 #include <X11/keysym.h>
 #include <cstdio>
 #include <cstdlib>
+#include <sstream>
 #include <sys/wait.h>
 #include <unistd.h>
+#include <vector>
 
 #include "config.h"
 
@@ -29,7 +31,8 @@ WindowManager* WindowManager::Create() {
 WindowManager::WindowManager(Display* display)
     : display_(display),
       root_(DefaultRootWindow(display)),
-      terminal_command_(GetTerminalCommand()) {}
+      terminal_command_(GetTerminalCommand()),
+      launcher_command_(GetLauncherCommand()) {}
 
 WindowManager::~WindowManager() {
     XCloseDisplay(display_);
@@ -71,6 +74,7 @@ void WindowManager::Run() {
     GrabKeyWithLockVariants(XK_q, Mod1Mask | ShiftMask);
     GrabKeyWithLockVariants(XK_space, Mod4Mask);
     GrabKeyWithLockVariants(XK_q, Mod4Mask);
+    GrabKeyWithLockVariants(XK_d, Mod4Mask);
 
     for (const std::string& command : GetAutostartCommands()) {
         LaunchCommand(command);
@@ -187,6 +191,10 @@ void WindowManager::OnKeyPress(const XKeyEvent& e) {
     if (keysym == XK_q && (e.state & Mod4Mask)) {
         CloseFocusedWindow();
     }
+
+    if (keysym == XK_d && (e.state & Mod4Mask)) {
+        LaunchCommand(launcher_command_);
+    }
 }
 
 void WindowManager::GrabKeyWithLockVariants(KeySym keysym, unsigned int modifiers) {
@@ -212,6 +220,17 @@ void WindowManager::GrabKeyWithLockVariants(KeySym keysym, unsigned int modifier
 }
 
 void WindowManager::LaunchCommand(const std::string& command) {
+    std::vector<std::string> tokens;
+    std::istringstream stream(command);
+    std::string token;
+    while (stream >> token) {
+        tokens.push_back(token);
+    }
+
+    if (tokens.empty()) {
+        return;
+    }
+
     pid_t pid = fork();
 
     if (pid < 0) {
@@ -220,7 +239,14 @@ void WindowManager::LaunchCommand(const std::string& command) {
 
     if (pid == 0) {
         setsid();
-        execlp(command.c_str(), command.c_str(), nullptr);
+
+        std::vector<char*> argv;
+        for (std::string& t : tokens) {
+            argv.push_back(t.data());
+        }
+        argv.push_back(nullptr);
+
+        execvp(argv[0], argv.data());
         _exit(1);
     }
 }

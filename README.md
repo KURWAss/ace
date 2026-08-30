@@ -17,6 +17,8 @@ A minimal floating window manager for X11, written in C++.
 - Resize a window: `Alt` + right mouse button + drag
 - Quit the window manager: `Alt` + `Shift` + `Q`
 - Close a window: `Super` + `Q`
+- Open the application launcher: `Super` + `D`
+- Open a terminal: `Super` + `Space`
 
 ## Project layout
 
@@ -38,6 +40,7 @@ ace itself doesn't launch anything on its own — it relies on external
 programs configured by you:
  
 - a terminal emulator, defaulting to [alacritty](https://alacritty.org/)
+- an application launcher, defaulting to [rofi](https://github.com/davatorium/rofi)
 
 On first run, ace creates a config file at `~/.config/ace/config` (if it
 doesn't already exist)

@@ -47,6 +47,33 @@ bool ParseConfigLine(const std::string& line, std::string& key, std::string& val
     return !key.empty() && !value.empty();
 }
 
+std::string GetValueForKey(const std::string& target_key, const std::string& fallback) {
+    std::string config_path = GetConfigPath();
+    if (config_path.empty()) {
+        return fallback;
+    }
+
+    std::ifstream in(config_path);
+    if (!in.is_open()) {
+        return fallback;
+    }
+
+    std::string line;
+    std::string key;
+    std::string value;
+    while (std::getline(in, line)) {
+        if (!ParseConfigLine(line, key, value)) {
+            continue;
+        }
+
+        if (key == target_key) {
+            return value;
+        }
+    }
+
+    return fallback;
+}
+
 }  // namespace
 
 std::string GetConfigPath() {
@@ -75,36 +102,17 @@ void EnsureConfigExists() {
         return;
     }
 
-    out << "terminal = alacritty\nexecute = alacritty\n";
+    out << "terminal = alacritty\n";
+    out << "apps = rofi -show drun\n";
+    out << "execute = alacritty\n";
 }
 
 std::string GetTerminalCommand() {
-    const std::string default_terminal = "alacritty";
+    return GetValueForKey("terminal", "alacritty");
+}
 
-    std::string config_path = GetConfigPath();
-    if (config_path.empty()) {
-        return default_terminal;
-    }
-
-    std::ifstream in(config_path);
-    if (!in.is_open()) {
-        return default_terminal;
-    }
-
-    std::string line;
-    std::string key;
-    std::string value;
-    while (std::getline(in, line)) {
-        if (!ParseConfigLine(line, key, value)) {
-            continue;
-        }
-
-        if (key == "terminal") {
-            return value;
-        }
-    }
-
-    return default_terminal;
+std::string GetLauncherCommand() {
+    return GetValueForKey("apps", "rofi");
 }
 
 std::vector<std::string> GetAutostartCommands() {

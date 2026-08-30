@@ -7,6 +7,7 @@
 std::string GetConfigPath();
 void EnsureConfigExists();
 std::string GetTerminalCommand();
+std::string GetLauncherCommand();
 std::vector<std::string> GetAutostartCommands();
 
 #endif  // ACE_CONFIG_H_

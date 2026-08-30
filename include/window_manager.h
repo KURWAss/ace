@@ -44,6 +44,7 @@ private:
 
     std::unordered_map<Window, bool> managed_windows_;
     std::string terminal_command_;
+    std::string launcher_command_;
 };
 
 #endif  // ACE_WINDOW_MANAGER_H_

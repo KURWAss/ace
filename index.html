@@ -1,0 +1,99 @@
+<head>
+    <link rel="stylesheet" href="assets/style.css">
+</head>
+
+<section class="info">
+
+    <div class="info-text">
+        <h2>Small codebase. Plain text config. No surprises.</h2>
+        <p>
+            Then you will love ace. Read the
+            <a href="https://github.com/KURWAss/ace/blob/main/README.md">README</a>
+            to see how it works, and <a href="https://github.com/KURWAss/ace/blob/main/README.md">build ace</a>!
+        </p>
+        <a class="download" href="https://github.com/KURWAss/ace/blob/main/README.md">
+            <span class="info-arrow">➡</span>
+            Build the latest ace version
+        </a>
+    </div>
+    
+    <a class="screen" href="assets/screenshot1.png" title="ace screenshot">
+        <img src="assets/screenshot1.png" alt="ace screenshot">
+    </a>
+  
+</section>
+
+<p>
+    ace is a <a href="http://en.wikipedia.org/wiki/Floating_window_manager">floating
+    window manager</a>, completely written from scratch. The target platform is
+    GNU/Linux, our code is Free and Open Source Software
+    (FOSS) under the GPLv3 license. ace is primarily targeted at people who
+    want a small, readable codebase they can actually understand and modify.
+    We agreed upon the following goals for ace:
+</p>
+
+<ol>
+    <li>
+        Write well readable, well <strong>documented</strong> code, split into
+        small, single-responsibility modules instead of one large file.
+        <br />
+        This includes being modifiable by people who do know how to program but who are
+        not necessarily familiar with all of X11's internals. That is, document why
+        things happen and when they happen so that the user gets a picture of the whole
+        process a Window Manager is responsible of by just reading the source code.
+    </li>
+    <li>
+        Use Xlib for interacting with X11.
+    </li>
+    <li>
+        Keep configuration a plain text file at <code>~/.config/ace/config</code>.
+        No embedded scripting language is required to get started.
+    </li>
+    <li>
+        Support the freedesktop.org EWMH standard, so that tools like
+        <code>wmctrl</code> and status bars can inspect ace's state.
+    </li>
+    <li>
+        Ship as a single small binary. No background daemon, no IPC socket.
+    </li>
+    <li>
+        Be UTF-8 clean.
+    </li>
+    <li>
+        The usual elitism amongst minimal window managers: Don't be bloated, don't be fancy
+        (simple borders are the most decoration we want to have).
+        <br />
+        However, we do not enforce unnecessary limits such as a maximum amount of source lines
+        of code. If it needs to be a bit bigger, it will be.
+    </li>
+    <li>
+        Do not add further complexity when it can be avoided. We are generally
+        happy with the feature set of ace and instead focus on fixing bugs and
+        maintaining it for stability. New features will therefore only be
+        considered if the benefit clearly outweighs the additional complexity.
+    </li>
+</ol>
+
+<p>
+    In addition to these stated goals, we try our best to uphold the following
+    values when considering contributions to the project:
+</p>
+
+<ul>
+    <li>
+        Never break configuration files or existing workflows. Breaking changes
+        require a major version bump.
+    </li>
+    <li>
+        Keep mental complexity low: once you know ace's key features, other features
+        should be easy to understand.
+    </li>
+    <li>
+        Only add features which benefit many people, instead of going to great
+        lengths to support rarely used workflows.
+    </li>
+    <li>
+        Only documented behavior is supported. Clear documentation is a requirement
+        for contributions.
+    </li>
+</ul>

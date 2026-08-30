@@ -30,6 +30,8 @@ private:
     static int OnXError(Display* display, XErrorEvent* e);
 
     void LaunchCommand(const std::string& command);
+    void CloseFocusedWindow();
+    void GrabKeyWithLockVariants(KeySym keysym, unsigned int modifiers);
 
     Display* display_;
     Window root_;
@@ -37,6 +39,8 @@ private:
     Window drag_start_window_ = None;
     XButtonEvent drag_start_button_;
     XWindowAttributes drag_start_attributes_;
+
+    Window focused_window_ = None;
 
     std::unordered_map<Window, bool> managed_windows_;
     std::string terminal_command_;

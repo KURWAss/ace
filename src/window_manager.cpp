@@ -3,6 +3,7 @@
 #include <X11/XKBlib.h>
 #include <X11/Xutil.h>
 #include <X11/keysym.h>
+#include <cstdio>
 #include <cstdlib>
 #include <sys/wait.h>
 #include <unistd.h>
@@ -12,6 +13,8 @@
 int WindowManager::OnXError(Display* display, XErrorEvent* e) {
     char buffer[1024];
     XGetErrorText(display, e->error_code, buffer, sizeof(buffer));
+    fprintf(stderr, "X error: %s (request code %d, minor code %d)\n",
+            buffer, e->request_code, e->minor_code);
     return 0;
 }
 
@@ -65,23 +68,9 @@ void WindowManager::Run() {
         None,
         None);
 
-    XGrabKey(
-        display_,
-        XKeysymToKeycode(display_, XK_Q),
-        Mod1Mask | ShiftMask,
-        root_,
-        False,
-        GrabModeAsync,
-        GrabModeAsync);
-
-    XGrabKey(
-        display_,
-        XKeysymToKeycode(display_, XK_space),
-        Mod4Mask,
-        root_,
-        False,
-        GrabModeAsync,
-        GrabModeAsync);
+    GrabKeyWithLockVariants(XK_q, Mod1Mask | ShiftMask);
+    GrabKeyWithLockVariants(XK_space, Mod4Mask);
+    GrabKeyWithLockVariants(XK_q, Mod4Mask);
 
     for (const std::string& command : GetAutostartCommands()) {
         LaunchCommand(command);
@@ -187,12 +176,38 @@ void WindowManager::OnMotionNotify(const XMotionEvent& e) {
 void WindowManager::OnKeyPress(const XKeyEvent& e) {
     KeySym keysym = XkbKeycodeToKeysym(display_, e.keycode, 0, 0);
 
-    if (keysym == XK_Q && (e.state & Mod1Mask) && (e.state & ShiftMask)) {
+    if (keysym == XK_q && (e.state & Mod1Mask) && (e.state & ShiftMask)) {
         exit(0);
     }
 
     if (keysym == XK_space && (e.state & Mod4Mask)) {
         LaunchCommand(terminal_command_);
+    }
+
+    if (keysym == XK_q && (e.state & Mod4Mask)) {
+        CloseFocusedWindow();
+    }
+}
+
+void WindowManager::GrabKeyWithLockVariants(KeySym keysym, unsigned int modifiers) {
+    KeyCode keycode = XKeysymToKeycode(display_, keysym);
+
+    const unsigned int lock_variants[] = {
+        0,
+        LockMask,
+        Mod2Mask,
+        LockMask | Mod2Mask,
+    };
+
+    for (unsigned int lock_mask : lock_variants) {
+        XGrabKey(
+            display_,
+            keycode,
+            modifiers | lock_mask,
+            root_,
+            False,
+            GrabModeAsync,
+            GrabModeAsync);
     }
 }
 
@@ -212,11 +227,53 @@ void WindowManager::LaunchCommand(const std::string& command) {
 
 void WindowManager::OnEnterNotify(const XCrossingEvent& e) {
     XSetInputFocus(display_, e.window, RevertToPointerRoot, CurrentTime);
+    focused_window_ = e.window;
+}
+
+void WindowManager::CloseFocusedWindow() {
+    if (focused_window_ == None) {
+        return;
+    }
+
+    Atom wm_protocols = XInternAtom(display_, "WM_PROTOCOLS", False);
+    Atom wm_delete_window = XInternAtom(display_, "WM_DELETE_WINDOW", False);
+
+    Atom* supported_protocols = nullptr;
+    int protocol_count = 0;
+    bool supports_delete = false;
+
+    if (XGetWMProtocols(display_, focused_window_, &supported_protocols, &protocol_count)) {
+        for (int i = 0; i < protocol_count; ++i) {
+            if (supported_protocols[i] == wm_delete_window) {
+                supports_delete = true;
+                break;
+            }
+        }
+        XFree(supported_protocols);
+    }
+
+    if (supports_delete) {
+        XClientMessageEvent message = {};
+        message.type = ClientMessage;
+        message.window = focused_window_;
+        message.message_type = wm_protocols;
+        message.format = 32;
+        message.data.l[0] = static_cast<long>(wm_delete_window);
+        message.data.l[1] = CurrentTime;
+
+        XSendEvent(display_, focused_window_, False, NoEventMask,
+                   reinterpret_cast<XEvent*>(&message));
+    } else {
+        XKillClient(display_, focused_window_);
+    }
 }
 
 void WindowManager::OnDestroyNotify(const XDestroyWindowEvent& e) {
     managed_windows_.erase(e.window);
     if (drag_start_window_ == e.window) {
         drag_start_window_ = None;
+    }
+    if (focused_window_ == e.window) {
+        focused_window_ = None;
     }
 }

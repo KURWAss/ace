@@ -30,17 +30,12 @@ private:
 
     static int OnXError(Display* display, XErrorEvent* e);
 
-    void LaunchCommand(const std::string& command);
     void CloseFocusedWindow();
     void GrabKeyWithLockVariants(KeySym keysym, unsigned int modifiers);
-
-    void InitializeEwmh();
-    void UpdateClientList();
-    void UpdateActiveWindow(Window window);
+    void NotifyClientListChanged();
 
     Display* display_;
     Window root_;
-    Window check_window_ = None;
 
     Window drag_start_window_ = None;
     XButtonEvent drag_start_button_;

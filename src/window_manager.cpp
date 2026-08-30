@@ -1,6 +1,7 @@
 #include "window_manager.h"
 
 #include <X11/XKBlib.h>
+#include <X11/Xatom.h>
 #include <X11/Xutil.h>
 #include <X11/keysym.h>
 #include <cstdio>
@@ -76,6 +77,8 @@ void WindowManager::Run() {
     GrabKeyWithLockVariants(XK_q, Mod4Mask);
     GrabKeyWithLockVariants(XK_d, Mod4Mask);
 
+    InitializeEwmh();
+
     for (const std::string& command : GetAutostartCommands()) {
         LaunchCommand(command);
     }
@@ -120,6 +123,7 @@ void WindowManager::OnMapRequest(const XMapRequestEvent& e) {
     XSelectInput(display_, e.window, EnterWindowMask);
     XMapWindow(display_, e.window);
     managed_windows_[e.window] = true;
+    UpdateClientList();
 
     XWindowAttributes attrs;
     XGetWindowAttributes(display_, e.window, &attrs);
@@ -254,6 +258,7 @@ void WindowManager::LaunchCommand(const std::string& command) {
 void WindowManager::OnEnterNotify(const XCrossingEvent& e) {
     XSetInputFocus(display_, e.window, RevertToPointerRoot, CurrentTime);
     focused_window_ = e.window;
+    UpdateActiveWindow(e.window);
 }
 
 void WindowManager::CloseFocusedWindow() {
@@ -296,10 +301,74 @@ void WindowManager::CloseFocusedWindow() {
 
 void WindowManager::OnDestroyNotify(const XDestroyWindowEvent& e) {
     managed_windows_.erase(e.window);
+    UpdateClientList();
+
     if (drag_start_window_ == e.window) {
         drag_start_window_ = None;
     }
     if (focused_window_ == e.window) {
         focused_window_ = None;
+        UpdateActiveWindow(None);
     }
+}
+
+void WindowManager::InitializeEwmh() {
+    check_window_ = XCreateSimpleWindow(display_, root_, -1, -1, 1, 1, 0, 0, 0);
+
+    Atom net_supporting_wm_check = XInternAtom(display_, "_NET_SUPPORTING_WM_CHECK", False);
+    Atom net_wm_name = XInternAtom(display_, "_NET_WM_NAME", False);
+    Atom utf8_string = XInternAtom(display_, "UTF8_STRING", False);
+    Atom net_supported = XInternAtom(display_, "_NET_SUPPORTED", False);
+    Atom net_client_list = XInternAtom(display_, "_NET_CLIENT_LIST", False);
+    Atom net_active_window = XInternAtom(display_, "_NET_ACTIVE_WINDOW", False);
+
+    XChangeProperty(
+        display_, root_, net_supporting_wm_check, XA_WINDOW, 32,
+        PropModeReplace, reinterpret_cast<unsigned char*>(&check_window_), 1);
+    XChangeProperty(
+        display_, check_window_, net_supporting_wm_check, XA_WINDOW, 32,
+        PropModeReplace, reinterpret_cast<unsigned char*>(&check_window_), 1);
+
+    const char* wm_name = "ace";
+    XChangeProperty(
+        display_, check_window_, net_wm_name, utf8_string, 8,
+        PropModeReplace, reinterpret_cast<const unsigned char*>(wm_name), 3);
+
+    Atom supported[] = {
+        net_supported,
+        net_supporting_wm_check,
+        net_client_list,
+        net_active_window,
+        net_wm_name,
+    };
+    XChangeProperty(
+        display_, root_, net_supported, XA_ATOM, 32,
+        PropModeReplace, reinterpret_cast<unsigned char*>(supported),
+        sizeof(supported) / sizeof(supported[0]));
+
+    UpdateClientList();
+    UpdateActiveWindow(None);
+}
+
+void WindowManager::UpdateClientList() {
+    Atom net_client_list = XInternAtom(display_, "_NET_CLIENT_LIST", False);
+
+    std::vector<Window> windows;
+    windows.reserve(managed_windows_.size());
+    for (const auto& entry : managed_windows_) {
+        windows.push_back(entry.first);
+    }
+
+    XChangeProperty(
+        display_, root_, net_client_list, XA_WINDOW, 32,
+        PropModeReplace, reinterpret_cast<unsigned char*>(windows.data()),
+        static_cast<int>(windows.size()));
+}
+
+void WindowManager::UpdateActiveWindow(Window window) {
+    Atom net_active_window = XInternAtom(display_, "_NET_ACTIVE_WINDOW", False);
+
+    XChangeProperty(
+        display_, root_, net_active_window, XA_WINDOW, 32,
+        PropModeReplace, reinterpret_cast<unsigned char*>(&window), 1);
 }

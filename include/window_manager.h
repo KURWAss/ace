@@ -4,6 +4,7 @@
 #include <X11/Xlib.h>
 #include <string>
 #include <unordered_map>
+#include <vector>
 
 class WindowManager {
 public:
@@ -33,8 +34,13 @@ private:
     void CloseFocusedWindow();
     void GrabKeyWithLockVariants(KeySym keysym, unsigned int modifiers);
 
+    void InitializeEwmh();
+    void UpdateClientList();
+    void UpdateActiveWindow(Window window);
+
     Display* display_;
     Window root_;
+    Window check_window_ = None;
 
     Window drag_start_window_ = None;
     XButtonEvent drag_start_button_;

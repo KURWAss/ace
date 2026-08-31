@@ -10,6 +10,10 @@
 
 A minimal floating window manager for X11, written in C++.
 
+## Notice about this branch!
+
+This branch was created exclusively for the ace's website. Only the website will be updated here, dont build from this branch because nothing other than the website is updated here. If you do not want to work with the website, use the main branch instead
+
 ## Features
 
 - Maps new windows as soon as they are created

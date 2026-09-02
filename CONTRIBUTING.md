@@ -23,6 +23,13 @@ the guidelines below may change over time.
 - Formatting follows the Google C++ Style Guide: 4-space indentation,
   opening braces on the same line, `snake_case` for variables, `PascalCase`
   for classes and methods.
+- A purely AI-generated pull request ("vibe-coded") cannot be accepted, because
+  the copyright status of such output is uncertain.
+- It can be very effective to ask a coding assistant to confirm and explain a
+  bug, but then verify correctness of the generated explanation by implementing
+  and testing your own solution. This process saves you time for the mechanical
+  steps, but ensures you understood the problem and solution.
+- Contributions must disclose AI assistance, e.g. "Created with help by Claude Opus 4.5".
 
 ## Testing changes
 
@@ -34,9 +41,10 @@ your primary window manager.
 
 Current priorities:
 
-- basic stability of the floating mode;
-- multi-monitor support;
-- a configuration file for keybindings.
+- Basic stability of the floating mode;
+- Multi-monitor support;
+
+Before sending a pull request for new features, please check with us that the feature is something we want to see in ace by opening an issue which has "feature request" or "enhancement" in its title.
 
 If you want to pick up one of these, please open an issue first so we can
 coordinate.

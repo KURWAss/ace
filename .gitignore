@@ -3,3 +3,5 @@ ace
 pkg/
 *.pkg.tar.*
 *.log
+*.swp
+.vscode/

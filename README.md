@@ -106,6 +106,7 @@ and start your session with `startx`.
 ![Screen1](assets/screenshot1.png)
 ![Screen2](assets/screenshot2.png)
 ![Screen3](assets/screenshot3.png)
+![Screen4](assets/screenshot4.png)
 
 ## License
 

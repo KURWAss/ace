@@ -13,6 +13,7 @@ Please include:
 - Steps to reproduce it (a minimal example config or sequence of events
   helps a lot)
 - Your ace version or commit hash, and your distro/X server setup
+- Your github account
 
 You should receive a response within a few days. Once the issue is
 confirmed, a fix will be prepared and a public advisory (crediting you,

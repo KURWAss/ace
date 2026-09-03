@@ -25,13 +25,21 @@ A minimal floating window manager for X11, written in C++.
 ```
 ace/
 ├── include/           header files
-│   └── window_manager.h
+│   ├── window_manager.h
+│   ├── ewmh.h
+│   ├── process.h
+│   └── config.h
 ├── src/                source files
 │   ├── main.cpp
-│   └── window_manager.cpp
+│   ├── window_manager.cpp
+│   ├── ewmh.cpp
+│   ├── process.cpp
+│   └── config.cpp
 ├── Makefile
 ├── README.md
-└── CONTRIBUTING.md
+├── run.sh
+├── CONTRIBUTING.md
+└── ... (Other files)
 ```
 
 ## Apps Dependencies

@@ -66,7 +66,7 @@ sudo pacman -S libx11
 make
 ```
 
-The `ace` binary will be produced in the project root.
+The `ace` binary will be produced in the project root. You can write `make help` to see Makefile command list
 
 ## Running
 

@@ -17,4 +17,9 @@ $(SRC_DIR)/%.o: $(SRC_DIR)/%.cpp
 clean:
 	rm -f $(TARGET) $(OBJECTS)
 
-.PHONY: clean
+help:
+	@echo "Usage:"
+	@echo "  make          - Build ace"
+	@echo "  make clean    - Remove object files"
+
+.PHONY: clean help

@@ -1,4 +1,4 @@
-![Title](assets/title.png)
+![Title](assets/images/title.png)
 
 ---
 
@@ -103,10 +103,10 @@ and start your session with `startx`.
 
 ## Screenshots
 
-![Screen1](assets/screenshot1.png)
-![Screen2](assets/screenshot2.png)
-![Screen3](assets/screenshot3.png)
-![Screen4](assets/screenshot4.png)
+![Screen1](assets/images/screenshot1.png)
+![Screen2](assets/images/screenshot2.png)
+![Screen3](assets/images/screenshot3.png)
+![Screen4](assets/images/screenshot4.png)
 
 ## License
 

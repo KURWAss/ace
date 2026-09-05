@@ -215,6 +215,9 @@ void WindowManager::OnKeyPress(const XKeyEvent& e) {
     for (const auto& binding : workspace_bindings) {
         if (keysym == binding.first && (e.state & Mod4Mask)) {
             workspaces::SwitchTo(binding.second);
+            XSetInputFocus(display_, PointerRoot, RevertToPointerRoot, CurrentTime);
+            focused_window_ = None;
+            ewmh::UpdateActiveWindow(display_, root_, None);
         }
     }
 }
@@ -242,6 +245,11 @@ void WindowManager::GrabKeyWithLockVariants(KeySym keysym, unsigned int modifier
 }
 
 void WindowManager::OnEnterNotify(const XCrossingEvent& e) {
+    XWindowAttributes attrs;
+    if (!XGetWindowAttributes(display_, e.window, &attrs) || attrs.map_state != IsViewable) {
+        return;
+    }
+
     XSetInputFocus(display_, e.window, RevertToPointerRoot, CurrentTime);
     focused_window_ = e.window;
     ewmh::UpdateActiveWindow(display_, root_, e.window);

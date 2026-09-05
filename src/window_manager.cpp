@@ -5,10 +5,12 @@
 #include <X11/keysym.h>
 #include <cstdio>
 #include <cstdlib>
+#include <utility>
 
 #include "config.h"
 #include "ewmh.h"
 #include "process.h"
+#include "workspaces.h"
 
 int WindowManager::OnXError(Display* display, XErrorEvent* e) {
     char buffer[1024];
@@ -74,7 +76,15 @@ void WindowManager::Run() {
     GrabKeyWithLockVariants(XK_q, Mod4Mask);
     GrabKeyWithLockVariants(XK_d, Mod4Mask);
 
+    const KeySym workspace_keysyms[] = {
+        XK_1, XK_2, XK_3, XK_4, XK_5, XK_6, XK_7, XK_8, XK_9, XK_0,
+    };
+    for (KeySym keysym : workspace_keysyms) {
+        GrabKeyWithLockVariants(keysym, Mod4Mask);
+    }
+
     ewmh::Initialize(display_, root_);
+    workspaces::Initialize(display_, root_);
 
     for (const std::string& command : GetAutostartCommands()) {
         LaunchCommand(command);
@@ -120,6 +130,7 @@ void WindowManager::OnMapRequest(const XMapRequestEvent& e) {
     XSelectInput(display_, e.window, EnterWindowMask);
     XMapWindow(display_, e.window);
     managed_windows_[e.window] = true;
+    workspaces::AddWindow(e.window);
     NotifyClientListChanged();
 
     XWindowAttributes attrs;
@@ -196,6 +207,16 @@ void WindowManager::OnKeyPress(const XKeyEvent& e) {
     if (keysym == XK_d && (e.state & Mod4Mask)) {
         LaunchCommand(launcher_command_);
     }
+
+    const std::pair<KeySym, int> workspace_bindings[] = {
+        {XK_1, 0}, {XK_2, 1}, {XK_3, 2}, {XK_4, 3}, {XK_5, 4},
+        {XK_6, 5}, {XK_7, 6}, {XK_8, 7}, {XK_9, 8}, {XK_0, 9},
+    };
+    for (const auto& binding : workspace_bindings) {
+        if (keysym == binding.first && (e.state & Mod4Mask)) {
+            workspaces::SwitchTo(binding.second);
+        }
+    }
 }
 
 void WindowManager::GrabKeyWithLockVariants(KeySym keysym, unsigned int modifiers) {
@@ -266,6 +287,7 @@ void WindowManager::CloseFocusedWindow() {
 
 void WindowManager::OnDestroyNotify(const XDestroyWindowEvent& e) {
     managed_windows_.erase(e.window);
+    workspaces::RemoveWindow(e.window);
     NotifyClientListChanged();
 
     if (drag_start_window_ == e.window) {

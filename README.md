@@ -19,6 +19,7 @@ A minimal floating window manager for X11, written in C++.
 - Close a window: `Super` + `Q`
 - Open the application launcher: `Super` + `D`
 - Open a terminal: `Super` + `Space`
+- Switch workspace: `Super` + `0`-`9`
 
 ## Project layout
 

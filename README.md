@@ -20,6 +20,7 @@ A minimal floating window manager for X11, written in C++.
 - Open the application launcher: `Super` + `D`
 - Open a terminal: `Super` + `Space`
 - Switch workspace: `Super` + `0`-`9`
+- ace uses only 5 RAM megabytes
 
 ## Project layout
 

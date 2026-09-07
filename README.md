@@ -38,7 +38,6 @@ ace/
 │   └── config.cpp
 ├── Makefile
 ├── README.md
-├── run.sh
 ├── CONTRIBUTING.md
 └── ... (Other files)
 ```
@@ -86,36 +85,28 @@ sudo pacman -S xorg-server-xephyr
 Xephyr :1 -screen 1280x800 &
 DISPLAY=:1 ./ace
 ```
+Alternatively, just run:
 
-Alternatively, the included `run.sh` script does this for you: it
-checks that Xephyr is installed and that `ace` has been built, then starts
+```
+make run
+```
+
+This checks that Xephyr is installed, builds `ace` if needed, then starts
 Xephyr and launches `ace` on `DISPLAY=:1`.
- 
-```
-chmod +x run.sh
-./run.sh
-```
 
 Then, in that same `DISPLAY=:1`, you can launch any X11 application, e.g.:
-
 ```
 DISPLAY=:1 xterm
 ```
-
 To use `ace` as your main window manager, add this to `~/.xinitrc`:
-
 ```
 exec /path/to/ace
 ```
-
 and start your session with `startx`.
 
 ## Screenshots
 
-![Screen1](assets/images/screenshot1.png)
-![Screen2](assets/images/screenshot2.png)
-![Screen3](assets/images/screenshot3.png)
-![Screen4](assets/images/screenshot4.png)
+The screenshots will be updated shortly, so they won't be available for now.
 
 ## License
 

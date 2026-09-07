@@ -42,6 +42,28 @@ ace/
 └── ... (Other files)
 ```
 
+## System-wide installation
+ 
+If you want to select `ace` as a session from your login manager
+(LightDM, GDM, SDDM, etc.), use the scripts in `assets/`.
+ 
+`assets/install.sh` copies the `ace` binary to `/usr/bin` and
+`assets/ace.desktop` to `/usr/share/xsessions`, so it shows up in the
+session picker on the login screen:
+ 
+```
+sudo ./assets/install.sh
+```
+ 
+`assets/delete.sh` removes both of these:
+ 
+```
+sudo ./assets/delete.sh
+```
+ 
+Both scripts require root, since they write to `/usr/bin` and
+`/usr/share/xsessions`.
+
 ## Apps Dependencies
  
 ace itself doesn't launch anything on its own — it relies on external

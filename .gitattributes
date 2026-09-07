@@ -1,6 +1,9 @@
 # Normalize line endings for all text files
 * text=auto eol=lf
 
+*.html text
+*.css text
+
 *.cpp text diff=cpp
 *.h   text diff=cpp
 

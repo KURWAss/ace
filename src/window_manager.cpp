@@ -198,7 +198,7 @@ void WindowManager::OnMotionNotify(const XMotionEvent& e) {
 void WindowManager::OnKeyPress(const XKeyEvent& e) {
     KeySym keysym = XkbKeycodeToKeysym(display_, e.keycode, 0, 0);
 
-    if (keysym == XK_q && (e.state & Mod1Mask) && (e.state & ShiftMask)) {
+    if (keysym == XK_q && (e.state & Mod4Mask) && (e.state & ShiftMask)) {
         exit(0);
     }
 

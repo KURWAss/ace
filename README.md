@@ -15,7 +15,7 @@ A minimal floating window manager for X11, written in C++.
 - Maps new windows as soon as they are created
 - Move a window: `Alt` + left mouse button + drag
 - Resize a window: `Alt` + right mouse button + drag
-- Quit the window manager: `Alt` + `Shift` + `Q`
+- Quit the window manager: `Super` + `Shift` + `Q`
 - Close a window: `Super` + `Q`
 - Open the application launcher: `Super` + `D`
 - Open a terminal: `Super` + `Space`

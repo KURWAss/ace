@@ -21,5 +21,13 @@ help:
 	@echo "Usage:"
 	@echo "  make          - Build ace"
 	@echo "  make clean    - Remove object files"
+	@echo "  make run      - Starts Xephyr"
 
-.PHONY: clean help
+run: $(TARGET)
+	@command -v Xephyr >/dev/null 2>&1 || { echo "Xephyr not found. Install it first (e.g. sudo pacman -S xorg-server-xephyr)."; exit 1; }
+	Xephyr :1 -screen 1280x800 & \
+	sleep 1; \
+	DISPLAY=:1 ./$(TARGET) & \
+	echo "Xephyr and ace are running on DISPLAY=:1"
+
+.PHONY: clean help run

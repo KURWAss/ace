@@ -45,7 +45,13 @@ void WindowManager::Run() {
         display_,
         root_,
         SubstructureRedirectMask | SubstructureNotifyMask);
+
     XSync(display_, False);
+
+    int screen = DefaultScreen(display_);
+    XSetWindowBackground(display_, root_, BlackPixel(display_, screen));
+    XClearWindow(display_, root_);
+    XFlush(display_);
 
     XGrabButton(
         display_,

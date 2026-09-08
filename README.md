@@ -129,7 +129,9 @@ and start your session with `startx`.
 
 ## Screenshots
 
-The screenshots will be updated shortly, so they won't be available for now.
+![Screen1](assets/screenshot1.png)
+![Screen2](assets/screenshot2.png)
+![Screen3](assets/screenshot3.png)
 
 ## License
 

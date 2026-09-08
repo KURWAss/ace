@@ -22,7 +22,6 @@ jobs:
           args: >
             --verbose
             --no-progress
-            --exclude-loading
             --exclude "img.shields.io"
             "**/*.md"
         env:

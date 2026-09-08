@@ -129,9 +129,9 @@ and start your session with `startx`.
 
 ## Screenshots
 
-![Screen1](assets/screenshot1.png)
-![Screen2](assets/screenshot2.png)
-![Screen3](assets/screenshot3.png)
+![Screen1](assets/images/screenshot1.png)
+![Screen2](assets/images/screenshot2.png)
+![Screen3](assets/images/screenshot3.png)
 
 ## License
 

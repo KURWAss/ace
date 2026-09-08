@@ -77,7 +77,7 @@ void WindowManager::Run() {
         None,
         None);
 
-    GrabKeyWithLockVariants(XK_q, Mod1Mask | ShiftMask);
+    GrabKeyWithLockVariants(XK_q, Mod4Mask | ControlMask);
     GrabKeyWithLockVariants(XK_space, Mod4Mask);
     GrabKeyWithLockVariants(XK_q, Mod4Mask);
     GrabKeyWithLockVariants(XK_d, Mod4Mask);
@@ -206,7 +206,7 @@ void WindowManager::OnKeyPress(const XKeyEvent& e) {
         LaunchCommand(terminal_command_);
     }
 
-    if (keysym == XK_q && (e.state & Mod4Mask)) {
+    if (keysym == XK_q && (e.state & Mod4Mask) && !(e.state & ControlMask)) {
         CloseFocusedWindow();
     }
 
@@ -221,9 +221,7 @@ void WindowManager::OnKeyPress(const XKeyEvent& e) {
     for (const auto& binding : workspace_bindings) {
         if (keysym == binding.first && (e.state & Mod4Mask)) {
             workspaces::SwitchTo(binding.second);
-            XSetInputFocus(display_, PointerRoot, RevertToPointerRoot, CurrentTime);
-            focused_window_ = None;
-            ewmh::UpdateActiveWindow(display_, root_, None);
+            RefocusUnderPointer();
         }
     }
 }
@@ -259,6 +257,36 @@ void WindowManager::OnEnterNotify(const XCrossingEvent& e) {
     XSetInputFocus(display_, e.window, RevertToPointerRoot, CurrentTime);
     focused_window_ = e.window;
     ewmh::UpdateActiveWindow(display_, root_, e.window);
+}
+
+void WindowManager::RefocusUnderPointer() {
+    Window root_return;
+    Window child_return;
+    int root_x;
+    int root_y;
+    int win_x;
+    int win_y;
+    unsigned int mask_return;
+
+    bool has_child = XQueryPointer(
+        display_, root_, &root_return, &child_return,
+        &root_x, &root_y, &win_x, &win_y, &mask_return) && child_return != None;
+
+    if (has_child) {
+        XWindowAttributes attrs;
+        has_child = XGetWindowAttributes(display_, child_return, &attrs) &&
+                    attrs.map_state == IsViewable;
+    }
+
+    if (has_child) {
+        XSetInputFocus(display_, child_return, RevertToPointerRoot, CurrentTime);
+        focused_window_ = child_return;
+        ewmh::UpdateActiveWindow(display_, root_, child_return);
+    } else {
+        XSetInputFocus(display_, PointerRoot, RevertToPointerRoot, CurrentTime);
+        focused_window_ = None;
+        ewmh::UpdateActiveWindow(display_, root_, None);
+    }
 }
 
 void WindowManager::CloseFocusedWindow() {

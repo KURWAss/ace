@@ -33,6 +33,7 @@ private:
     void CloseFocusedWindow();
     void GrabKeyWithLockVariants(KeySym keysym, unsigned int modifiers);
     void NotifyClientListChanged();
+    void RefocusUnderPointer();
 
     Display* display_;
     Window root_;

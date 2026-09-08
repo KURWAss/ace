@@ -2,6 +2,7 @@
 
 #include <X11/XKBlib.h>
 #include <X11/Xutil.h>
+#include <X11/cursorfont.h>
 #include <X11/keysym.h>
 #include <cstdio>
 #include <cstdlib>
@@ -51,6 +52,10 @@ void WindowManager::Run() {
     int screen = DefaultScreen(display_);
     XSetWindowBackground(display_, root_, BlackPixel(display_, screen));
     XClearWindow(display_, root_);
+    XFlush(display_);
+
+    Cursor default_cursor = XCreateFontCursor(display_, XC_left_ptr);
+    XDefineCursor(display_, root_, default_cursor);
     XFlush(display_);
 
     XGrabButton(

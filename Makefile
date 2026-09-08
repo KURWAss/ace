@@ -17,17 +17,20 @@ $(SRC_DIR)/%.o: $(SRC_DIR)/%.cpp
 clean:
 	rm -f $(TARGET) $(OBJECTS)
 
-help:
-	@echo "Usage:"
-	@echo "  make          - Build ace"
-	@echo "  make clean    - Remove object files"
-	@echo "  make run      - Starts Xephyr"
-
 run: $(TARGET)
 	@command -v Xephyr >/dev/null 2>&1 || { echo "Xephyr not found. Install it first (e.g. sudo pacman -S xorg-server-xephyr)."; exit 1; }
+	-pkill Xephyr 2>/dev/null
+	-pkill -f "DISPLAY=:1 ./$(TARGET)" 2>/dev/null
+	sleep 0.5
 	Xephyr :1 -screen 1280x800 & \
 	sleep 1; \
 	DISPLAY=:1 ./$(TARGET) & \
 	echo "Xephyr and ace are running on DISPLAY=:1"
+
+help:
+	@echo "Usage:"
+	@echo "  make          - Build ace"
+	@echo "  make run      - Build ace and run it in Xephyr"
+	@echo "  make clean    - Remove object files"
 
 .PHONY: clean help run

@@ -1,0 +1,14 @@
+name: typos
+
+on:
+  push:
+    branches: [main, site]
+  pull_request:
+    branches: [main, site]
+
+jobs:
+  typos:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: crate-ci/typos@master

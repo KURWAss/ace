@@ -86,6 +86,7 @@ void WindowManager::Run() {
     GrabKeyWithLockVariants(XK_space, Mod4Mask);
     GrabKeyWithLockVariants(XK_q, Mod4Mask);
     GrabKeyWithLockVariants(XK_d, Mod4Mask);
+    GrabKeyWithLockVariants(XK_f, Mod4Mask);
 
     const KeySym workspace_keysyms[] = {
         XK_1, XK_2, XK_3, XK_4, XK_5, XK_6, XK_7, XK_8, XK_9, XK_0,
@@ -131,6 +132,9 @@ void WindowManager::Run() {
             case EnterNotify:
                 OnEnterNotify(e.xcrossing);
                 break;
+            case ClientMessage:
+                OnClientMessage(e.xclient);
+                break;
             default:
                 break;
         }
@@ -149,6 +153,10 @@ void WindowManager::OnMapRequest(const XMapRequestEvent& e) {
     if (attrs.x == 0 && attrs.y == 0) {
         XMoveWindow(display_, e.window, 50, 50);
     }
+
+    XSetInputFocus(display_, e.window, RevertToPointerRoot, CurrentTime);
+    focused_window_ = e.window;
+    ewmh::UpdateActiveWindow(display_, root_, e.window);
 }
 
 void WindowManager::OnConfigureRequest(const XConfigureRequestEvent& e) {
@@ -217,6 +225,10 @@ void WindowManager::OnKeyPress(const XKeyEvent& e) {
 
     if (keysym == XK_d && (e.state & Mod4Mask)) {
         LaunchCommand(launcher_command_);
+    }
+
+    if (keysym == XK_f && (e.state & Mod4Mask)) {
+        ToggleFocusedFullscreen();
     }
 
     const std::pair<KeySym, int> workspace_bindings[] = {
@@ -294,6 +306,57 @@ void WindowManager::RefocusUnderPointer() {
     }
 }
 
+void WindowManager::SetFullscreen(Window window, bool fullscreen) {
+    bool currently_fullscreen = fullscreen_windows_.count(window) > 0;
+    if (fullscreen == currently_fullscreen) {
+        return;
+    }
+
+    if (fullscreen) {
+        XWindowAttributes attrs;
+        if (!XGetWindowAttributes(display_, window, &attrs)) {
+            return;
+        }
+        fullscreen_windows_[window] = Geometry{attrs.x, attrs.y, attrs.width, attrs.height};
+
+        int screen = DefaultScreen(display_);
+        int screen_width = DisplayWidth(display_, screen);
+        int screen_height = DisplayHeight(display_, screen);
+
+        XMoveResizeWindow(display_, window, 0, 0, screen_width, screen_height);
+        XRaiseWindow(display_, window);
+    } else {
+        auto it = fullscreen_windows_.find(window);
+        if (it == fullscreen_windows_.end()) {
+            return;
+        }
+        const Geometry& geometry = it->second;
+        XMoveResizeWindow(display_, window, geometry.x, geometry.y,
+                           geometry.width, geometry.height);
+        fullscreen_windows_.erase(it);
+    }
+
+    ewmh::SetFullscreen(display_, window, fullscreen);
+}
+
+void WindowManager::ToggleFocusedFullscreen() {
+    if (focused_window_ == None) {
+        return;
+    }
+
+    bool currently_fullscreen = fullscreen_windows_.count(focused_window_) > 0;
+    SetFullscreen(focused_window_, !currently_fullscreen);
+}
+
+void WindowManager::OnClientMessage(const XClientMessageEvent& e) {
+    bool currently_fullscreen = fullscreen_windows_.count(e.window) > 0;
+    bool want_fullscreen = false;
+
+    if (ewmh::ResolveFullscreenRequest(display_, e, currently_fullscreen, &want_fullscreen)) {
+        SetFullscreen(e.window, want_fullscreen);
+    }
+}
+
 void WindowManager::CloseFocusedWindow() {
     if (focused_window_ == None) {
         return;
@@ -334,6 +397,7 @@ void WindowManager::CloseFocusedWindow() {
 
 void WindowManager::OnDestroyNotify(const XDestroyWindowEvent& e) {
     managed_windows_.erase(e.window);
+    fullscreen_windows_.erase(e.window);
     workspaces::RemoveWindow(e.window);
     NotifyClientListChanged();
 

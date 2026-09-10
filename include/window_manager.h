@@ -17,6 +17,13 @@ public:
     void Run();
 
 private:
+    struct Geometry {
+        int x;
+        int y;
+        int width;
+        int height;
+    };
+
     explicit WindowManager(Display* display);
 
     void OnMapRequest(const XMapRequestEvent& e);
@@ -27,6 +34,7 @@ private:
     void OnKeyPress(const XKeyEvent& e);
     void OnDestroyNotify(const XDestroyWindowEvent& e);
     void OnEnterNotify(const XCrossingEvent& e);
+    void OnClientMessage(const XClientMessageEvent& e);
 
     static int OnXError(Display* display, XErrorEvent* e);
 
@@ -34,6 +42,8 @@ private:
     void GrabKeyWithLockVariants(KeySym keysym, unsigned int modifiers);
     void NotifyClientListChanged();
     void RefocusUnderPointer();
+    void ToggleFocusedFullscreen();
+    void SetFullscreen(Window window, bool fullscreen);
 
     Display* display_;
     Window root_;
@@ -45,6 +55,7 @@ private:
     Window focused_window_ = None;
 
     std::unordered_map<Window, bool> managed_windows_;
+    std::unordered_map<Window, Geometry> fullscreen_windows_;
     std::string terminal_command_;
     std::string launcher_command_;
 };

@@ -19,6 +19,8 @@ void Initialize(Display* display, Window root) {
     Atom net_supported = XInternAtom(display, "_NET_SUPPORTED", False);
     Atom net_client_list = XInternAtom(display, "_NET_CLIENT_LIST", False);
     Atom net_active_window = XInternAtom(display, "_NET_ACTIVE_WINDOW", False);
+    Atom net_wm_state = XInternAtom(display, "_NET_WM_STATE", False);
+    Atom net_wm_state_fullscreen = XInternAtom(display, "_NET_WM_STATE_FULLSCREEN", False);
 
     XChangeProperty(
         display, root, net_supporting_wm_check, XA_WINDOW, 32,
@@ -38,6 +40,8 @@ void Initialize(Display* display, Window root) {
         net_client_list,
         net_active_window,
         net_wm_name,
+        net_wm_state,
+        net_wm_state_fullscreen,
     };
     XChangeProperty(
         display, root, net_supported, XA_ATOM, 32,
@@ -64,6 +68,54 @@ void UpdateActiveWindow(Display* display, Window root, Window window) {
     XChangeProperty(
         display, root, net_active_window, XA_WINDOW, 32,
         PropModeReplace, reinterpret_cast<unsigned char*>(&window), 1);
+}
+
+void SetFullscreen(Display* display, Window window, bool fullscreen) {
+    Atom net_wm_state = XInternAtom(display, "_NET_WM_STATE", False);
+    Atom net_wm_state_fullscreen = XInternAtom(display, "_NET_WM_STATE_FULLSCREEN", False);
+
+    if (fullscreen) {
+        XChangeProperty(
+            display, window, net_wm_state, XA_ATOM, 32,
+            PropModeReplace, reinterpret_cast<unsigned char*>(&net_wm_state_fullscreen), 1);
+    } else {
+        XChangeProperty(
+            display, window, net_wm_state, XA_ATOM, 32,
+            PropModeReplace, nullptr, 0);
+    }
+}
+
+bool ResolveFullscreenRequest(Display* display, const XClientMessageEvent& e,
+                               bool currently_fullscreen, bool* want_fullscreen) {
+    Atom net_wm_state = XInternAtom(display, "_NET_WM_STATE", False);
+    Atom net_wm_state_fullscreen = XInternAtom(display, "_NET_WM_STATE_FULLSCREEN", False);
+
+    if (static_cast<Atom>(e.message_type) != net_wm_state) {
+        return false;
+    }
+
+    Atom first_property = static_cast<Atom>(e.data.l[1]);
+    Atom second_property = static_cast<Atom>(e.data.l[2]);
+    if (first_property != net_wm_state_fullscreen && second_property != net_wm_state_fullscreen) {
+        return false;
+    }
+
+    const long kNetWmStateRemove = 0;
+    const long kNetWmStateAdd = 1;
+    const long kNetWmStateToggle = 2;
+
+    long action = e.data.l[0];
+    if (action == kNetWmStateAdd) {
+        *want_fullscreen = true;
+    } else if (action == kNetWmStateRemove) {
+        *want_fullscreen = false;
+    } else if (action == kNetWmStateToggle) {
+        *want_fullscreen = !currently_fullscreen;
+    } else {
+        return false;
+    }
+
+    return true;
 }
 
 }  // namespace ewmh

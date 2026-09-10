@@ -8,9 +8,9 @@
 ![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)
 ![build](https://github.com/KURWAss/ace/actions/workflows/build.yml/badge.svg)
 
-A minimal floating window manager for X11, written in C++.
+A minimal floating window manager for X11, written in C++. One of biggest plus: ace uses only 5 RAM megabytes
 
-## Features
+## Keybinds
 
 - Maps new windows as soon as they are created
 - Move a window: `Alt` + left mouse button + drag
@@ -21,7 +21,6 @@ A minimal floating window manager for X11, written in C++.
 - Open a terminal: `Super` + `Space`
 - Switch workspace: `Super` + `0`-`9`
 - Make fullscreen: `Super` + `F`
-- Ace uses only 5 RAM megabytes
 
 ## Project layout
 

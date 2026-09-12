@@ -125,7 +125,7 @@ To use `ace` as your main window manager, add this to `~/.xinitrc`:
 ```
 exec /path/to/ace
 ```
-and start your session with `startx`.
+and start your session with `startx`. Or select in your greeter
 
 ## Screenshots
 
